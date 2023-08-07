@@ -17,8 +17,8 @@ public class HotelsController : Controller
     
     [HttpGet]
     [Route("/hotels")]
-    public async Task FetchHotels([FromQuery] HotelParameters hotelParameters)
+    public async Task<GeoJsonResponse?> FetchHotels([FromQuery] HotelParameters hotelParameters)
     {
-       var x =  await _hotelProvider.FetchHotels(hotelParameters);
+        return await _hotelProvider.FetchHotels(hotelParameters);
     }
 }

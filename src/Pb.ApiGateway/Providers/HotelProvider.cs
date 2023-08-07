@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Pb.ApiGateway.Models;
 
 namespace Pb.ApiGateway.Providers;
@@ -25,24 +26,39 @@ public class HotelProvider : IHotelProvider
     {
         if (CheckParameters(parameters)) return null;
 
-        var searchResponse = await _searchClient.NearbyAsync(
-            new NearbyRequest
-            {
-                Lon = parameters.Lon!.Value,
-                Lat = parameters.Lat!.Value,
-                InDate = parameters.InDate,
-                OutDate = parameters.OutDate
-            });
+        try
+        {
+            var searchResponse = await _searchClient.NearbyAsync(
+                new NearbyRequest
+                {
+                    Lon = parameters.Lon!.Value,
+                    Lat = parameters.Lat!.Value,
+                    InDate = parameters.InDate,
+                    OutDate = parameters.OutDate
+                }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
+                "Search gRPC service failed to respond in time"));
 
-        var profileResponse = await _profileClient.GetProfilesAsync(
-            new ProfileRequest
-            {
-                HotelIds = { searchResponse.HotelIds }
-            });
+            var profileResponse = await _profileClient.GetProfilesAsync(
+                new ProfileRequest
+                {
+                    HotelIds = { searchResponse.HotelIds }
+                }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
+                "Profile gRPC service failed to respond in time"));
 
-        var hotels = CreateGeoJsonResponse(profileResponse.Hotels);
+            var hotels = CreateGeoJsonResponse(profileResponse.Hotels);
+            return hotels;
+        }
+        catch (RpcException e)
+        {
+            _log.LogError("One of gRPC services responded with Unavailable status code : {Exception}", e);
 
-        return hotels;
+            return new GeoJsonResponse();
+        }
+        catch (Exception e)
+        {
+            _log.LogError("Unknown exception: {Exception}", e);
+            return new GeoJsonResponse();
+        }
     }
 
     private static GeoJsonResponse? CreateGeoJsonResponse(IEnumerable<Hotel> hotels)

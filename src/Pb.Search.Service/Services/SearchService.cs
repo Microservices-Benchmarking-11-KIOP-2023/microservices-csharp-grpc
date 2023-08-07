@@ -26,15 +26,30 @@ public class SearchService : Search.SearchBase
             {
                 Lat = request.Lat,
                 Lon = request.Lon
-            }) ?? throw NullReferenceException("Invalid Geo service request parameters");
-        }
-        catch (NullReferenceException e)
-        {
+            }) ?? throw new RpcException(new Status(StatusCode.Internal,
+                "Profile gRPC service failed to respond in time or the response was null"));
             
-        }
+            _log.LogInformation("Successfully retrieved data from Geo Service");
 
-        _log.LogInformation("");
-        
-        var hotelRates = await _rateClient.GetRatesAsync()
+            var hotelRates = await _rateClient.GetRatesAsync(new RateRequest()
+            {
+                HotelIds = { nearbyHotels.HotelIds },
+                InDate = request.InDate,
+                OutDate = request.OutDate
+            }) ?? throw new RpcException(new Status(StatusCode.Internal,
+                "Profile gRPC service failed to respond in time or the response was null"));
+            
+            _log.LogInformation("Successfully retrieved data from Rates Service");
+            
+            return new SearchResult()
+            {
+                HotelIds = { hotelRates.RatePlans.Select(x => x.HotelId) }
+            };
+        }
+        catch (RpcException e)
+        {
+            _log.LogError("One of gRPC services returned null: {Exception}", e);
+            return null!;
+        }
     }
 }

@@ -1,17 +1,14 @@
 
+using Pb.Geo.Service.Models;
 using Pb.Geo.Service.Services;
+using Pb.Geo.Service.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services
-    .AddGrpc()
-    .AddJsonTranscoding();
+builder.Services.SetupGrpcServices();
+builder.Services.AddSingleton<IPointLoader>(new JsonFilePointLoader(builder.Configuration["DATA:GEO"]));
 
 var app = builder.Build();
 
 app.MapGrpcService<GeoService>();
-app.MapGet("/",
-    () =>
-        "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
