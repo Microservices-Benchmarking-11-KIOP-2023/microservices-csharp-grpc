@@ -63,7 +63,7 @@ public class HotelProvider : IHotelProvider
 
     private static GeoJsonResponse? CreateGeoJsonResponse(IEnumerable<Hotel> hotels)
     {
-        var features = new List<Feature>();
+        var features = new List<Feature?>();
 
         foreach (var hotel in hotels)
         {
@@ -71,11 +71,19 @@ public class HotelProvider : IHotelProvider
             {
                 Type = "Feature",
                 Id = hotel.Id,
-                Properties = hotel,
+                Properties = new Properties()
+                { 
+                    Name = hotel.Name, 
+                    PhoneNumber = hotel.PhoneNumber
+                },
                 Geometry = new Geometry
                 {
                     Type = "Point",
-                    Coordinates = new List<float> { hotel.Address.Lon, hotel.Address.Lat }
+                    Coordinates = new double[]
+                    {
+                        hotel.Address.Lon, 
+                        hotel.Address.Lat
+                    }
                 }
             });
         }
@@ -83,7 +91,7 @@ public class HotelProvider : IHotelProvider
         return new GeoJsonResponse
         {
             Type = "FeatureCollection",
-            Features = features
+            Features = features!
         };
     }
 
@@ -96,10 +104,9 @@ public class HotelProvider : IHotelProvider
         }
 
         if (parameters is { Lon: not null, Lat: not null }) return false;
-        
-        _log.LogError("Please specify proper lon/lat params");
-        
-        return true;
 
+        _log.LogError("Please specify proper lon/lat params");
+
+        return true;
     }
 }

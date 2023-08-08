@@ -1,6 +1,5 @@
 syntax = "proto3";
 option csharp_namespace = "Pb.Search.Service";
-import "google/api/annotations.proto";
 
 package geo;
 

@@ -6,6 +6,7 @@
 //
 //    var point = Point.FromJson(jsonString);
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
@@ -15,12 +16,12 @@ namespace Pb.Geo.Service.Models;
 
 public interface IPointLoader
 {
-    Point[] Points { get; }
+    IEnumerable<Point> Points { get; }
 }
 
 public class JsonFilePointLoader : IPointLoader
 {
-    public Point[] Points { get; }
+    public IEnumerable<Point> Points { get; }
 
     public JsonFilePointLoader(string filePath)
     {
@@ -42,7 +43,7 @@ public partial class Point
 
 public partial class Point
 {
-    public static Point[] FromJson(string json) => JsonConvert.DeserializeObject<Point[]>(json, Pb.Geo.Service.Models.Converter.Settings);
+    public static IEnumerable<Point> FromJson(string json) => JsonConvert.DeserializeObject<IEnumerable<Point>>(json, Pb.Geo.Service.Models.Converter.Settings);
 }
 
 public static class Serialize

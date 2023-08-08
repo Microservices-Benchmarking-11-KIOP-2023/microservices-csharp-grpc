@@ -1,3 +1,4 @@
+using System.Collections;
 using Grpc.Core;
 using Pb.Geo.Service.Models;
 
@@ -6,15 +7,16 @@ namespace Pb.Geo.Service.Services;
 public class GeoService : Geo.GeoBase
 {
     private readonly ILogger<GeoService> _log;
-    private readonly IPointLoader _pointLoader;
+    private readonly IEnumerable<Point> _points;
     private const int MaxSearchRadius = 10;
     private const int MaxSearchResults = Int32.MaxValue;
     private const double EarthRadius = 6371;
+    private const double RadianConst = Math.PI / 180;
 
     public GeoService(ILogger<GeoService> log, IPointLoader pointLoader)
     {
         _log = log;
-        _pointLoader = pointLoader;
+        _points = pointLoader.Points;
     }
 
     public override Task<GeoResult> Nearby(GeoRequest request, ServerCallContext context)
@@ -25,8 +27,10 @@ public class GeoService : Geo.GeoBase
             Lon = request.Lon
         };
         
-        var kNearestNeighbours = GetNeighbors(center, _pointLoader.Points);
-        
+        //TODO: Add streaming to return values as they are, without waiting for a result.
+        //It will require changing .proto files
+        var kNearestNeighbours = GetNeighbors(center, _points);
+
         return Task.FromResult(new GeoResult()
         {
             HotelIds = { kNearestNeighbours.Select(x => x.HotelId) }
@@ -35,7 +39,7 @@ public class GeoService : Geo.GeoBase
     
     //TODO: Validate if returns proper values.
     //Source: https://stackoverflow.com/questions/65256053/find-k-nearest-neighbor-in-c-sharp
-    private IEnumerable<Point> GetNeighbors(Point point, params Point[] points)
+    private IEnumerable<Point> GetNeighbors(Point point, IEnumerable<Point> points)
     {
         return points
             .Select(p => new { Point = p, Distance = CalculateDistanceBetweenPoints(point, p) })
@@ -47,19 +51,19 @@ public class GeoService : Geo.GeoBase
     
     private double CalculateDistanceBetweenPoints(Point originPoint, Point destinationPoint)
     {
-        var dlat = ToRadians(originPoint.Lat - destinationPoint.Lat);
-        var dlon = ToRadians(originPoint.Lon - originPoint.Lon);
+        var distanceLat = ToRadians(originPoint.Lat - destinationPoint.Lat);
+        var distanceLon = ToRadians(originPoint.Lon - originPoint.Lon);
 
-        var a = Math.Pow(Math.Sin(dlat / 2), 2) +
+        var inverseHaversine = Math.Pow(Math.Sin(distanceLat / 2), 2) +
                 Math.Cos(originPoint.Lat) * Math.Cos(destinationPoint.Lat) *
-                Math.Pow(Math.Sin(dlon / 2), 2);
-        var c = 2 * Math.Asin(Math.Sqrt(a));
+                Math.Pow(Math.Sin(distanceLon / 2), 2);
+        var centralAngle = 2 * Math.Asin(Math.Sqrt(inverseHaversine));
 
-        return (c * EarthRadius);
+        return centralAngle * EarthRadius;
     }
 
     static double ToRadians(double degrees)
     {
-        return degrees * Math.PI / 180;
+        return degrees * RadianConst;
     }
 }
