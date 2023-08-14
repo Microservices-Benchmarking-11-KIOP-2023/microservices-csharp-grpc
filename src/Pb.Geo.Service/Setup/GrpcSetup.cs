@@ -7,6 +7,7 @@ public static class GrpcSetup
         services
             .AddGrpc()
             .AddJsonTranscoding();
+        
         return services;
     }
 }

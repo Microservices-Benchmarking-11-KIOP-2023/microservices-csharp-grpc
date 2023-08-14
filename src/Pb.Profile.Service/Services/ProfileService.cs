@@ -1,16 +1,15 @@
-using System.Collections;
 using Grpc.Core;
-using Pb.Profile.Service;
 using Pb.Profile.Service.Models;
+using Profile;
 
 namespace Pb.Profile.Service.Services;
 
-public class ProfileService : Profile.ProfileBase
+public class ProfileService : global::Profile.Profile.ProfileBase
 {
     private readonly ILogger<ProfileService> _log;
     private readonly IDictionary<string, Hotel> _profiles;
 
-    public ProfileService(ILogger<ProfileService> log, IHotelsLoader hotelLoader)
+    public ProfileService(ILogger<ProfileService> log, IHotelLoader hotelLoader)
     {
         _log = log;
         _profiles = InitializeProfiles(hotelLoader.Hotels);

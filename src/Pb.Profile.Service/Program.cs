@@ -5,7 +5,7 @@ using Pb.Profile.Service.Setup;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.SetupGrpcServices();
-builder.Services.AddSingleton<IHotelsLoader>(new JsonFileHotelsLoader(builder.Configuration["DATA:HOTELS"]));
+builder.Services.AddSingleton<IHotelLoader>(new HotelLoader(builder.Configuration["DATA:HOTELS"]));
 var app = builder.Build();
 
 app.MapGrpcService<ProfileService>();

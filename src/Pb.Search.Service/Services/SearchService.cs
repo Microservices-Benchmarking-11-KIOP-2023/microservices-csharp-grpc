@@ -1,15 +1,18 @@
+using Geo;
 using Grpc.Core;
-using Pb.Search.Service;
-
+using Rate;
+using Search;
+using RateClient = Rate.Rate.RateClient;
+using GeoClient = Geo.Geo.GeoClient;
 namespace Pb.Search.Service.Services;
 
-public class SearchService : Search.SearchBase
+public class SearchService : global::Search.Search.SearchBase
 {
     private readonly ILogger<SearchService> _log;
-    private readonly Geo.GeoClient _geoClient;
-    private readonly Rate.RateClient _rateClient;
+    private readonly GeoClient _geoClient;
+    private readonly RateClient _rateClient;
 
-    public SearchService(ILogger<SearchService> log, Geo.GeoClient geoClient, Rate.RateClient rateClient)
+    public SearchService(ILogger<SearchService> log, GeoClient geoClient, RateClient rateClient)
     {
         _log = log;
         _geoClient = geoClient;

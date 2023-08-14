@@ -6,9 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
-
+    
     <ItemGroup>
-        <Protobuf Include="Protos\rate.proto" GrpcServices="Server" />
+        <Protobuf Include="..\Pb.Common\Protos\rate.proto" GrpcServices="Server" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.Rate" />
     </ItemGroup>
 
     <ItemGroup>

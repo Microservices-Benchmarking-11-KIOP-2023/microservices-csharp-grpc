@@ -1,5 +1,5 @@
 using Pb.Search.Service.Services;
-using Pb.Search.Setup;
+using Pb.Search.Service.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 

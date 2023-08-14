@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>dd19b36c-077f-4e6f-a0b3-5171b5c36e9f</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,33 +21,13 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Protobuf Include="..\Pb.Common\Protos\profile.proto" GrpcServices="Client" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.ApiGateway" />
+        <Protobuf Include="..\Pb.Common\Protos\search.proto" GrpcServices="Client" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.ApiGateway" />
+    </ItemGroup>
+    
+    <ItemGroup>
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
-
-    <ItemGroup>
-      <Protobuf Include="Protos\search.proto">
-        <GrpcServices>Client</GrpcServices>
-        <Access>Public</Access>
-        <ProtoCompile>True</ProtoCompile>
-        <CompileOutputs>True</CompileOutputs>
-        <OutputDir>obj\Debug\net7.0\</OutputDir>
-        <Generator>MSBuild:Compile</Generator>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Protobuf>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Protobuf Include="Protos\profile.proto">
-            <GrpcServices>Client</GrpcServices>
-            <Access>Public</Access>
-            <ProtoCompile>True</ProtoCompile>
-            <CompileOutputs>True</CompileOutputs>
-            <OutputDir>obj\Debug\net7.0\</OutputDir>
-            <Generator>MSBuild:Compile</Generator>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Protobuf>
-    </ItemGroup>
-
 </Project>

@@ -18,39 +18,9 @@
 
 
     <ItemGroup>
-        <Protobuf Include="Protos\rate.proto">
-            <GrpcServices>Client</GrpcServices>
-            <Access>Public</Access>
-            <ProtoCompile>True</ProtoCompile>
-            <CompileOutputs>True</CompileOutputs>
-            <OutputDir>obj\Debug\net7.0\</OutputDir>
-            <Generator>MSBuild:Compile</Generator>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Protobuf>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Protobuf Include="Protos\geo.proto">
-            <GrpcServices>Client</GrpcServices>
-            <Access>Public</Access>
-            <ProtoCompile>True</ProtoCompile>
-            <CompileOutputs>True</CompileOutputs>
-            <OutputDir>obj\Debug\net7.0\</OutputDir>
-            <Generator>MSBuild:Compile</Generator>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Protobuf>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Protobuf Include="Protos\search.proto">
-            <GrpcServices>Server</GrpcServices>
-            <Access>Public</Access>
-            <ProtoCompile>True</ProtoCompile>
-            <CompileOutputs>True</CompileOutputs>
-            <OutputDir>obj\Debug\net7.0\</OutputDir>
-            <Generator>MSBuild:Compile</Generator>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Protobuf>
+        <Protobuf Include="..\Pb.Common\Protos\geo.proto" GrpcServices="Client" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.ApiGateway" />
+        <Protobuf Include="..\Pb.Common\Protos\rate.proto" GrpcServices="Client" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.ApiGateway" />
+        <Protobuf Include="..\Pb.Common\Protos\search.proto" GrpcServices="Server" ProtoCompile="True" CompileOutputs="True" Generator="MSBuild:Compile" Namespace="Pb.ApiGateway" />
     </ItemGroup>
     
     <ItemGroup>

@@ -1,11 +1,10 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0.10-alpine3.18-amd64 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/Pb.Geo.Service/Pb.Geo.Service.csproj", "src/Pb.Geo.Service/"]
+COPY ["src/Pb.Common/Protos", "src/Pb.Common/Protos"]
 RUN dotnet restore "src/Pb.Geo.Service/Pb.Geo.Service.csproj"
 COPY . .
 WORKDIR "/src/src/Pb.Geo.Service"

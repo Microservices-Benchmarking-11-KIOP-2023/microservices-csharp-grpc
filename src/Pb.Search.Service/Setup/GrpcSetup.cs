@@ -1,6 +1,7 @@
-using Pb.Search.Service;
+using GeoClient = Geo.Geo.GeoClient;
+using RateClient = Rate.Rate.RateClient;
 
-namespace Pb.Search.Setup;
+namespace Pb.Search.Service.Setup;
 
 public static class GrpcSetup
 {
@@ -10,11 +11,11 @@ public static class GrpcSetup
             .AddGrpc()
             .AddJsonTranscoding();
 
-        services.AddGrpcClient<Geo.GeoClient>(o =>
+        services.AddGrpcClient<GeoClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:GEO").Value ?? throw new InvalidOperationException());
         });
-        services.AddGrpcClient<Rate.RateClient>(o =>
+        services.AddGrpcClient<RateClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:RATE").Value ?? throw new InvalidOperationException());
         });

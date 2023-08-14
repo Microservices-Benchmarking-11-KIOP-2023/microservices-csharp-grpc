@@ -1,5 +1,10 @@
 using Grpc.Core;
 using Pb.ApiGateway.Models;
+using Profile;
+using Search;
+using SearchClient = Search.Search.SearchClient;
+using ProfileClient = Profile.Profile.ProfileClient;
+using Hotel = Profile.Hotel;
 
 namespace Pb.ApiGateway.Providers;
 
@@ -11,11 +16,11 @@ public interface IHotelProvider
 public class HotelProvider : IHotelProvider
 {
     private readonly ILogger<HotelProvider> _log;
-    private readonly Search.SearchClient _searchClient;
-    private readonly Profile.ProfileClient _profileClient;
+    private readonly SearchClient _searchClient;
+    private readonly ProfileClient _profileClient;
 
-    public HotelProvider(ILogger<HotelProvider> log, Profile.ProfileClient profileClient,
-        Search.SearchClient searchClient)
+    public HotelProvider(ILogger<HotelProvider> log, ProfileClient profileClient,
+        SearchClient searchClient)
     {
         _log = log;
         _profileClient = profileClient;
@@ -24,6 +29,7 @@ public class HotelProvider : IHotelProvider
 
     public async Task<GeoJsonResponse?> FetchHotels(HotelParameters parameters)
     {
+        _log.LogInformation("Processing request. Checking ");
         if (CheckParameters(parameters)) return null;
 
         try
@@ -51,7 +57,6 @@ public class HotelProvider : IHotelProvider
         catch (RpcException e)
         {
             _log.LogError("One of gRPC services responded with Unavailable status code : {Exception}", e);
-
             return new GeoJsonResponse();
         }
         catch (Exception e)
@@ -72,8 +77,8 @@ public class HotelProvider : IHotelProvider
                 Type = "Feature",
                 Id = hotel.Id,
                 Properties = new Properties()
-                { 
-                    Name = hotel.Name, 
+                {
+                    Name = hotel.Name,
                     PhoneNumber = hotel.PhoneNumber
                 },
                 Geometry = new Geometry
@@ -81,7 +86,7 @@ public class HotelProvider : IHotelProvider
                     Type = "Point",
                     Coordinates = new double[]
                     {
-                        hotel.Address.Lon, 
+                        hotel.Address.Lon,
                         hotel.Address.Lat
                     }
                 }

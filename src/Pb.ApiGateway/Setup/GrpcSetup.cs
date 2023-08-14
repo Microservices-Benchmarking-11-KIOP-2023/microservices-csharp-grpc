@@ -1,7 +1,7 @@
-using Grpc.Net.Client;
+using SearchClient = Search.Search.SearchClient;
+using ProfileClient = Profile.Profile.ProfileClient;
 
 namespace Pb.ApiGateway.Setup;
-
 public static class GrpcSetup
 {
     public static IServiceCollection SetupGrpcServices(this IServiceCollection services, IConfiguration config)
@@ -10,7 +10,7 @@ public static class GrpcSetup
             .AddGrpc()
             .AddJsonTranscoding();
 
-        services.AddGrpcClient<Search.SearchClient>(o =>
+        services.AddGrpcClient<SearchClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:SEARCH").Value ?? throw new InvalidOperationException());
         }).ConfigureChannel(options =>
@@ -21,7 +21,7 @@ public static class GrpcSetup
             };
         });
         
-        services.AddGrpcClient<Profile.ProfileClient>(o =>
+        services.AddGrpcClient<ProfileClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:PROFILE").Value ?? throw new InvalidOperationException());
         }).ConfigureChannel(options =>
