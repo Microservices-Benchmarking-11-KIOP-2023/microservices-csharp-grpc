@@ -1,0 +1,38 @@
+services:
+  gateway:
+    build: src/Pb.ApiGateway
+    ports:
+      - 5000:443
+    depends_on:
+      - search
+      - profile
+  search:
+    build: src/Pb.Search.Service
+    depends_on:
+      - geo
+      - rate
+    ports:
+      - 5001:443
+    stdin_open: true
+    tty: true
+  profile:
+    #image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-profile:latest
+    build: src/Pb.Profile.Service
+    stdin_open: true
+    tty: true
+    ports:
+      - 5002:443
+  geo:
+    #image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-geo:latest
+    build: src/Pb.Geo.Service
+    stdin_open: true
+    tty: true
+    ports:
+      - 5003:443
+  rate:
+    #image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-rate:latest
+    build: src/Pb.Rate.Service
+    stdin_open: true
+    tty: true
+    ports:
+      - 5004:443

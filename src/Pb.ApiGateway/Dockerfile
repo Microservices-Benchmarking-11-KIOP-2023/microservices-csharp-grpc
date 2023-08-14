@@ -1,6 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0.10-alpine3.18-amd64 AS base
 WORKDIR /app
-
+EXPOSE 443  
+EXPOSE 80  
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/Pb.ApiGateway/Pb.ApiGateway.csproj", "src/Pb.ApiGateway/"]

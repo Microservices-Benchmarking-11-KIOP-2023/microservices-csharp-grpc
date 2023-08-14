@@ -1,4 +1,3 @@
-
 using Pb.ApiGateway.Providers;
 using Pb.ApiGateway.Setup;
 
@@ -8,7 +7,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.SetupGrpcServices(builder.Configuration);
-
 builder.Services.AddSingleton<IHotelProvider, HotelProvider>();
 
 var app = builder.Build();

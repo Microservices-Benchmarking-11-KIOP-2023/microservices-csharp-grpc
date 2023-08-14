@@ -1,6 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0.10-alpine3.18-amd64 AS base
 WORKDIR /app
-
+EXPOSE 5001
+EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/Pb.Search.Service/Pb.Search.Service.csproj", "src/Pb.Search.Service/"]
