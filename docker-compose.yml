@@ -15,8 +15,6 @@ services:
     depends_on:
       - geo
       - rate
-    ports:
-      - 5001:443
     stdin_open: true
     tty: true
   profile:
@@ -26,8 +24,6 @@ services:
       context: .
     stdin_open: true
     tty: true
-    ports:
-      - 5002:443
   geo:
     image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-geo:latest
     build:
@@ -35,8 +31,6 @@ services:
       context: .
     stdin_open: true
     tty: true
-    ports:
-      - 5003:443
   rate:
     image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-rate:latest
     build:
@@ -44,5 +38,3 @@ services:
       context: .
     stdin_open: true
     tty: true
-    ports:
-      - 5004:443
