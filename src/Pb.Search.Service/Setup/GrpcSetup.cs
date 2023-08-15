@@ -1,3 +1,4 @@
+using Grpc.Core;
 using GeoClient = Geo.Geo.GeoClient;
 using RateClient = Rate.Rate.RateClient;
 
@@ -14,10 +15,14 @@ public static class GrpcSetup
         services.AddGrpcClient<GeoClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:GEO").Value ?? throw new InvalidOperationException());
+            o.ChannelOptionsActions.Add(options =>
+                options.Credentials = ChannelCredentials.Insecure);
         });
         services.AddGrpcClient<RateClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:RATE").Value ?? throw new InvalidOperationException());
+            o.ChannelOptionsActions.Add(options =>
+                options.Credentials = ChannelCredentials.Insecure);
         });
 
         return services;

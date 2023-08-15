@@ -1,3 +1,5 @@
+using Grpc.Core;
+using Grpc.Net.Client;
 using SearchClient = Search.Search.SearchClient;
 using ProfileClient = Profile.Profile.ProfileClient;
 
@@ -12,7 +14,10 @@ public static class GrpcSetup
 
         services.AddGrpcClient<SearchClient>(o =>
         {
-            o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:SEARCH").Value ?? throw new InvalidOperationException());
+            o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:SEARCH").Value ??
+                                throw new InvalidOperationException());
+            o.ChannelOptionsActions.Add(options =>
+                options.Credentials = ChannelCredentials.Insecure);
         }).ConfigureChannel(options =>
         {
             options.HttpHandler = new SocketsHttpHandler()
@@ -24,6 +29,8 @@ public static class GrpcSetup
         services.AddGrpcClient<ProfileClient>(o =>
         {
             o.Address = new Uri(config.GetSection("SERVICES:ADDRESSES:PROFILE").Value ?? throw new InvalidOperationException());
+            o.ChannelOptionsActions.Add(options =>
+                options.Credentials = ChannelCredentials.Insecure);
         }).ConfigureChannel(options =>
         {
             options.HttpHandler = new SocketsHttpHandler()
