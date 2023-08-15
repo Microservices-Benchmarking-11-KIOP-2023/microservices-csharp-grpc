@@ -15,34 +15,18 @@ services:
     depends_on:
       - geo
       - rate
-    ports:
-      - 5001:443
-    stdin_open: true
-    tty: true
   profile:
     image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-profile:latest
     build:
       dockerfile: src/Pb.Profile.Service/Dockerfile
       context: .
-    stdin_open: true
-    tty: true
-    ports:
-      - 5002:443
   geo:
     image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-geo:latest
     build:
       dockerfile: src/Pb.Geo.Service/Dockerfile
       context: .
-    stdin_open: true
-    tty: true
-    ports:
-      - 5003:443
   rate:
     image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-rate:latest
     build:
       dockerfile: src/Pb.Rate.Service/Dockerfile
       context: .
-    stdin_open: true
-    tty: true
-    ports:
-      - 5004:443
