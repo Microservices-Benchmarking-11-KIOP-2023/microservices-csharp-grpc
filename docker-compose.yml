@@ -1,14 +1,16 @@
 services:
   gateway:
+    image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-gateway:latest
     build:
       dockerfile: src/Pb.ApiGateway/Dockerfile
       context: .
     ports:
-      - 5000:443
+      - 5000:80
     depends_on:
       - search
       - profile
   search:
+    image: ghcr.io/microservices-benchmarking-11-kiop-2023/csharp-search:latest
     build: 
       dockerfile: src/Pb.Search.Service/Dockerfile
       context: .
