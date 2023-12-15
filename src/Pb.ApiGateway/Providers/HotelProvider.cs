@@ -1,3 +1,4 @@
+using System.Globalization;
 using Grpc.Core;
 using Pb.ApiGateway.Models;
 using Profile;
@@ -30,10 +31,15 @@ public class HotelProvider : IHotelProvider
     public async Task<GeoJsonResponse?> FetchHotels(HotelParameters parameters)
     {
         _log.LogInformation("Processing request. Checking ");
-        if (CheckParameters(parameters)) return null;
+        if (AreParametersInvalid(parameters))
+            throw new Exception(
+                $"Invalid Parameters: {parameters.Lon!.Value}, {parameters.Lat!.Value},{parameters.InDate},{parameters.OutDate}");
 
         try
         {
+            _log.LogInformation("Calling Search with params: {ParametersLon}, {ParametersLat},{ParametersInDate},{ParametersOutDate}",
+                parameters.Lon!.Value, parameters.Lat!.Value, parameters.InDate, parameters.OutDate);
+
             var searchResponse = await _searchClient.NearbyAsync(
                 new NearbyRequest
                 {
@@ -44,12 +50,15 @@ public class HotelProvider : IHotelProvider
                 }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
                 "Search gRPC service failed to respond in time"));
 
+            _log.LogInformation("Calling profile with number of hotels {HotelIds}:",searchResponse.HotelIds.Count);
             var profileResponse = await _profileClient.GetProfilesAsync(
                 new ProfileRequest
                 {
                     HotelIds = { searchResponse.HotelIds }
                 }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
                 "Profile gRPC service failed to respond in time"));
+            
+            _log.LogInformation("Retrieved data from both search and profile service");
 
             var hotels = CreateGeoJsonResponse(profileResponse.Hotels);
             return hotels;
@@ -100,18 +109,23 @@ public class HotelProvider : IHotelProvider
         };
     }
 
-    private bool CheckParameters(HotelParameters parameters)
+    private bool AreParametersInvalid(HotelParameters parameters)
     {
-        if (string.IsNullOrWhiteSpace(parameters.InDate) || string.IsNullOrWhiteSpace(parameters.OutDate))
+        var isValidFormatDateIn = DateTime.TryParseExact(parameters.InDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateIn);
+        var isValidFormatDateOut = DateTime.TryParseExact(parameters.OutDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOut);
+
+        if (!isValidFormatDateIn && !isValidFormatDateOut)
         {
-            _log.LogError("Please specify proper inDate/outDate params");
+            _log.LogError("Please specify proper inDate/outDate params {Parameters}", parameters);
             return true;
         }
 
-        if (parameters is { Lon: not null, Lat: not null }) return false;
-
-        _log.LogError("Please specify proper lon/lat params");
-
+        if (parameters is { Lon: not null, Lat: not null })
+        {
+            return false;
+        }
+        
+        _log.LogError("Please specify proper lon/lat params {Parameters}", parameters);
         return true;
     }
 }
