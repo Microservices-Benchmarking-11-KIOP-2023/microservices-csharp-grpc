@@ -8,21 +8,17 @@ namespace Pb.Search.Service.Services;
 
 public class SearchService : global::Search.Search.SearchBase
 {
-    private readonly ILogger<SearchService> _log;
     private readonly GeoClient _geoClient;
     private readonly RateClient _rateClient;
 
-    public SearchService(ILogger<SearchService> log, GeoClient geoClient, RateClient rateClient)
+    public SearchService(GeoClient geoClient, RateClient rateClient)
     {
-        _log = log;
         _geoClient = geoClient;
         _rateClient = rateClient;
     }
 
     public override async Task<SearchResult> Nearby(NearbyRequest request, ServerCallContext context)
     {
-        _log.LogInformation("Search service called with parameters: {Request}", request);
-
         try
         {
             var nearbyHotels = await _geoClient.NearbyAsync(new GeoRequest()
@@ -32,8 +28,6 @@ public class SearchService : global::Search.Search.SearchBase
             }) ?? throw new RpcException(new Status(StatusCode.Internal,
                 "Profile gRPC service failed to respond in time or the response was null"));
 
-            _log.LogInformation("Successfully retrieved data from Geo Service");
-
             var hotelRates = await _rateClient.GetRatesAsync(new RateRequest()
             {
                 HotelIds = { nearbyHotels.HotelIds },
@@ -42,8 +36,6 @@ public class SearchService : global::Search.Search.SearchBase
             }) ?? throw new RpcException(new Status(StatusCode.Internal,
                 "Profile gRPC service failed to respond in time or the response was null"));
 
-            _log.LogInformation("Successfully retrieved data from Rates Service");
-
             return new SearchResult()
             {
                 HotelIds = { hotelRates.RatePlans.Select(x => x.HotelId) }
@@ -51,7 +43,6 @@ public class SearchService : global::Search.Search.SearchBase
         }
         catch (RpcException e)
         {
-            _log.LogError("One of gRPC services returned null: {Exception}", e);
             return null!;
         }
     }

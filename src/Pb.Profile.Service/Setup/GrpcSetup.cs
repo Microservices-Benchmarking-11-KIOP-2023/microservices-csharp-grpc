@@ -1,3 +1,5 @@
+using Pb.Profile.Service.Services;
+
 namespace Pb.Profile.Service.Setup;
 
 public static class GrpcSetup
@@ -7,6 +9,7 @@ public static class GrpcSetup
         services
             .AddGrpc()
             .AddJsonTranscoding();
+        services.AddSingleton<ProfileService>();
         return services;
     }
 }

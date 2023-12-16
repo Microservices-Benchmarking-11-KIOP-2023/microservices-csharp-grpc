@@ -6,27 +6,26 @@ namespace Pb.Profile.Service.Services;
 
 public class ProfileService : global::Profile.Profile.ProfileBase
 {
-    private readonly ILogger<ProfileService> _log;
     private readonly IDictionary<string, Hotel> _profiles;
 
-    public ProfileService(ILogger<ProfileService> log, IHotelLoader hotelLoader)
+    public ProfileService(IHotelLoader hotelLoader)
     {
-        _log = log;
         _profiles = InitializeProfiles(hotelLoader.Hotels);
     }
 
     public override Task<ProfileResult> GetProfiles(ProfileRequest request, ServerCallContext context)
     {
-        return Task.FromResult(new ProfileResult()
+        var result = new ProfileResult();
+
+        foreach (var hotelId in request.HotelIds)
+        {
+            if (_profiles.TryGetValue(hotelId, out var hotelProfile))
             {
-                Hotels =
-                {
-                    _profiles
-                        .Where(p => request.HotelIds.Contains(p.Key))
-                        .Select(p => p.Value)
-                }
+                result.Hotels.Add(hotelProfile);
             }
-        );
+        }
+
+        return Task.FromResult(result);
     }
 
     private Dictionary<string, Hotel> InitializeProfiles(Hotel[] hotels)

@@ -6,28 +6,25 @@ namespace Pb.Rate.Service.Services
 {
     public class RateService : global::Rate.Rate.RateBase
     {
-        private readonly ILogger<RateService> _log;
         private readonly IDictionary<(string, string, string), List<RatePlan>> _rateTable;
 
-        public RateService(ILogger<RateService> logger, IRatePlansLoader ratePlansLoader)
+        public RateService(IRatePlansLoader ratePlansLoader)
         {
-            _log = logger;
             _rateTable = InitializeRateTable(ratePlansLoader.RateTable);
         }
 
-        public override Task<RateResult> GetRates(RateRequest request, ServerCallContext context)
+        public override async Task<RateResult> GetRates(RateRequest request, ServerCallContext context)
         {
             var result = new RateResult();
-
             foreach (var hotelId in request.HotelIds)
             {
                 var stay = (hotelId, request.InDate, request.OutDate);
-
+            
                 if (_rateTable.TryGetValue(stay, out var ratePlans))
                     result.RatePlans.AddRange(ratePlans);
             }
-
-            return Task.FromResult(result);
+            
+            return result; 
         }
 
         private IDictionary<(string, string, string), List<RatePlan>> InitializeRateTable(IEnumerable<RatePlan> ratePlans)

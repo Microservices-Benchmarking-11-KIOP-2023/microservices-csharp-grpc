@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Pb.Search.Service.Services;
 using Pb.Search.Service.Setup;
 

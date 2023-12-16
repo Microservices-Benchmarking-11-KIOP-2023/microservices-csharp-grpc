@@ -1,3 +1,5 @@
+using Pb.Rate.Service.Services;
+
 namespace Pb.Rate.Service.Setup;
 
 public static class GrpcSetup
@@ -7,6 +9,7 @@ public static class GrpcSetup
         services
             .AddGrpc()
             .AddJsonTranscoding();
+        services.AddSingleton<RateService>();
         return services;
     }
 }

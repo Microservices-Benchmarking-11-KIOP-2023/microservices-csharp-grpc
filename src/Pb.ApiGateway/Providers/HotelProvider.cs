@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Grpc.Core;
 using Pb.ApiGateway.Models;
@@ -16,30 +17,19 @@ public interface IHotelProvider
 
 public class HotelProvider : IHotelProvider
 {
-    private readonly ILogger<HotelProvider> _log;
     private readonly SearchClient _searchClient;
     private readonly ProfileClient _profileClient;
 
-    public HotelProvider(ILogger<HotelProvider> log, ProfileClient profileClient,
-        SearchClient searchClient)
+    public HotelProvider(ProfileClient profileClient, SearchClient searchClient)
     {
-        _log = log;
         _profileClient = profileClient;
         _searchClient = searchClient;
     }
 
     public async Task<GeoJsonResponse?> FetchHotels(HotelParameters parameters)
     {
-        _log.LogInformation("Processing request. Checking ");
-        if (AreParametersInvalid(parameters))
-            throw new Exception(
-                $"Invalid Parameters: {parameters.Lon!.Value}, {parameters.Lat!.Value},{parameters.InDate},{parameters.OutDate}");
-
         try
         {
-            _log.LogInformation("Calling Search with params: {ParametersLon}, {ParametersLat},{ParametersInDate},{ParametersOutDate}",
-                parameters.Lon!.Value, parameters.Lat!.Value, parameters.InDate, parameters.OutDate);
-
             var searchResponse = await _searchClient.NearbyAsync(
                 new NearbyRequest
                 {
@@ -49,28 +39,23 @@ public class HotelProvider : IHotelProvider
                     OutDate = parameters.OutDate
                 }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
                 "Search gRPC service failed to respond in time"));
-
-            _log.LogInformation("Calling profile with number of hotels {HotelIds}:",searchResponse.HotelIds.Count);
+            
             var profileResponse = await _profileClient.GetProfilesAsync(
                 new ProfileRequest
                 {
                     HotelIds = { searchResponse.HotelIds }
                 }) ?? throw new RpcException(new Status(StatusCode.Unavailable,
                 "Profile gRPC service failed to respond in time"));
-            
-            _log.LogInformation("Retrieved data from both search and profile service");
 
             var hotels = CreateGeoJsonResponse(profileResponse.Hotels);
             return hotels;
         }
         catch (RpcException e)
         {
-            _log.LogError("One of gRPC services responded with Unavailable status code : {Exception}", e);
             return new GeoJsonResponse();
         }
         catch (Exception e)
         {
-            _log.LogError("Unknown exception: {Exception}", e);
             return new GeoJsonResponse();
         }
     }
@@ -116,7 +101,6 @@ public class HotelProvider : IHotelProvider
 
         if (!isValidFormatDateIn && !isValidFormatDateOut)
         {
-            _log.LogError("Please specify proper inDate/outDate params {Parameters}", parameters);
             return true;
         }
 
@@ -125,7 +109,6 @@ public class HotelProvider : IHotelProvider
             return false;
         }
         
-        _log.LogError("Please specify proper lon/lat params {Parameters}", parameters);
         return true;
     }
 }
